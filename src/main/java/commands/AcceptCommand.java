@@ -14,7 +14,7 @@ import services.game.exceptions.AlreadyPlayingException;
 
 import java.util.Objects;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 public class AcceptCommand extends Command {
 

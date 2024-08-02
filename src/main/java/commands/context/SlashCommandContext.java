@@ -10,9 +10,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import services.player.Player;
 
 import javax.imageio.ImageIO;
@@ -80,7 +77,8 @@ public record SlashCommandContext(SlashCommandInteraction event) implements Comm
     }
 
     public void replyView(GameView view) {
-        replyView(view, (hook) -> {});
+        replyView(view, (hook) -> {
+        });
     }
 
     public void replyView(GameView view, Consumer<InteractionHook> onSuccess) {

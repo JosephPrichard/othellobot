@@ -9,7 +9,7 @@ import commands.views.GameStateView;
 import othello.BoardRenderer;
 import services.game.IGameService;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 public class ViewCommand extends Command {
 

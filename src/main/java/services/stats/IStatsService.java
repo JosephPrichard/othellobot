@@ -9,7 +9,6 @@ import services.player.Player;
 
 import java.util.List;
 
-// performs crud operations to services stored in an external data store
 public interface IStatsService {
 
     StatsResult writeStats(GameResult result);

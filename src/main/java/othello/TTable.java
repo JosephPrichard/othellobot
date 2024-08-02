@@ -9,14 +9,18 @@ import java.util.Random;
 
 public class TTable {
 
+    public record Node(long key, float heuristic, int depth) {
+
+    }
+
     private final int[][] table;
-    private final TTNode[][] cache;
+    private final Node[][] cache;
     private int hits = 0;
     private int misses = 0;
 
     public TTable(int tableSize) {
         // each cache line has 2 elements, one being "replace by depth" and one being "replace always"
-        this.cache = new TTNode[tableSize][2];
+        this.cache = new Node[tableSize][2];
 
         var tableLen = OthelloBoard.getBoardSize() * OthelloBoard.getBoardSize();
         var generator = new Random();
@@ -52,7 +56,7 @@ public class TTable {
         }
     }
 
-    public void put(TTNode node) {
+    public void put(Node node) {
         var h = (int) (node.key() % cache.length);
         var cacheLine = cache[h];
         // check if "replace by depth" is populated
@@ -72,7 +76,7 @@ public class TTable {
     }
 
     @Nullable
-    public TTNode get(long key) {
+    public Node get(long key) {
         var h = (int) (key % cache.length);
         var cacheLine = cache[h];
 

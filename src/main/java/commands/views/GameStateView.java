@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 public class GameStateView {
 
     private static String getScoreText(Game game) {
-        return "Black: " + game.getBlackScore() + " points \n" + "White: " + game.getWhiteScore() + " points \n";
+        return "Black: " + game.blackScore() + " points \n" + "White: " + game.whiteScore() + " points \n";
     }
 
     private static String getTag(Player player) {
@@ -46,17 +46,17 @@ public class GameStateView {
         var desc = getScoreText(game) + "Your opponent has moved: " + move;
 
         var embed = new EmbedBuilder()
-            .setTitle("Your game with " + game.getOtherPlayer().name())
+            .setTitle("Your game with " + game.otherPlayer().name())
             .setDescription(desc)
             .setFooter(game.isBlackMove() ? "Black to move" : "White to move");
 
         return new GameView(embed)
-            .setMessage(getTag(game.getCurrentPlayer()))
+            .setMessage(getTag(game.currentPlayer()))
             .setImage(image);
     }
 
     public static GameView createSimulationView(Game game, Tile move, BufferedImage image) {
-        var desc = getScoreText(game) + game.getOtherPlayer().name() + " has moved: " + move;
+        var desc = getScoreText(game) + game.otherPlayer().name() + " has moved: " + move;
 
         var embed = new EmbedBuilder()
             .setTitle(game.blackPlayer().name() + " vs " + game.whitePlayer().name())
@@ -67,7 +67,7 @@ public class GameStateView {
     }
 
     public static GameView createGameView(Game game, BufferedImage image) {
-        var desc = getScoreText(game) + game.getCurrentPlayer().name() + " to move";
+        var desc = getScoreText(game) + game.currentPlayer().name() + " to move";
 
         var embed = new EmbedBuilder()
             .setTitle(game.blackPlayer().name() + " vs " + game.whitePlayer().name())
@@ -75,7 +75,7 @@ public class GameStateView {
             .setFooter(game.isBlackMove() ? "Black to move" : "White to move");
 
         return new GameView(embed)
-            .setMessage(getTag(game.getCurrentPlayer()))
+            .setMessage(getTag(game.currentPlayer()))
             .setImage(image);
     }
 

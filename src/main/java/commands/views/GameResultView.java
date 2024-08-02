@@ -12,6 +12,7 @@ import services.player.Player;
 import services.stats.StatsResult;
 
 import java.awt.image.BufferedImage;
+
 public class GameResultView {
 
     private static String getStatsMessage(GameResult gameRes, StatsResult statsRes) {
@@ -39,8 +40,7 @@ public class GameResultView {
         var message = "";
         if (!result.winner().isBot()) {
             message = "<@" + result.winner() + "> ";
-        }
-        else if (!result.loser().isBot()) {
+        } else if (!result.loser().isBot()) {
             message = "<@" + result.loser() + "> ";
         }
         return message;
@@ -50,7 +50,7 @@ public class GameResultView {
         var embed = new EmbedBuilder();
 
         var desc = getMoveMessage(result.winner(), move.toString()) +
-            getScoreMessage(game.getWhiteScore(), game.getBlackScore()) + "\n" +
+            getScoreMessage(game.whiteScore(), game.blackScore()) + "\n" +
             getStatsMessage(result, statsResult);
         embed.setDescription(desc);
 
@@ -79,7 +79,7 @@ public class GameResultView {
         var embed = new EmbedBuilder();
 
         var desc = getMoveMessage(result.winner(), move.toString()) +
-            getScoreMessage(game.getWhiteScore(), game.getBlackScore());
+            getScoreMessage(game.whiteScore(), game.blackScore());
         embed.setDescription(desc);
 
         return new GameView(embed)

@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 public class MoveCommand extends Command {
 
@@ -60,7 +60,7 @@ public class MoveCommand extends Command {
     }
 
     public void doBotMove(CommandContext ctx, Game game) {
-        var currPlayer = game.getCurrentPlayer();
+        var currPlayer = game.currentPlayer();
         var depth = Player.Bot.getDepthFromId(currPlayer.id());
 
         var latch = new CountDownLatch(1);

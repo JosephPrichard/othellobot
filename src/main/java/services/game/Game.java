@@ -4,18 +4,27 @@
 
 package services.game;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import othello.OthelloBoard;
 import othello.Tile;
 import services.player.Player;
 
 import java.util.List;
-import java.util.Objects;
 
+@ToString
+@EqualsAndHashCode
 public class Game {
 
+    @EqualsAndHashCode.Exclude
     private final OthelloBoard board;
+
     private final Player whitePlayer;
+
     private final Player blackPlayer;
+
+    @EqualsAndHashCode.Exclude
     private List<Tile> currPotentialMoves;
 
     public Game(OthelloBoard board, Player blackPlayer, Player whitePlayer) {
@@ -47,19 +56,19 @@ public class Game {
         return blackPlayer;
     }
 
-    public Player getCurrentPlayer() {
+    public Player currentPlayer() {
         return board.isBlackMove() ? blackPlayer : whitePlayer;
     }
 
-    public Player getOtherPlayer() {
+    public Player otherPlayer() {
         return board.isBlackMove() ? whitePlayer : blackPlayer;
     }
 
-    public int getBlackScore() {
+    public int blackScore() {
         return (int) board.blackScore();
     }
 
-    public int getWhiteScore() {
+    public int whiteScore() {
         return (int) board.whiteScore();
     }
 
@@ -95,7 +104,7 @@ public class Game {
     }
 
     public GameResult createResult() {
-        var diff = getBlackScore() - getWhiteScore();
+        var diff = blackScore() - whiteScore();
         if (diff > 0) {
             return GameResult.WinLoss(blackPlayer, whitePlayer);
         } else if (diff < 0) {
@@ -113,27 +122,5 @@ public class Game {
         } else {
             throw new IllegalStateException("Player not part of a game attempted to forfeit");
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Game game = (Game) o;
-        return game.whitePlayer.equals(whitePlayer) && game.blackPlayer.equals(blackPlayer);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(whitePlayer, blackPlayer);
-    }
-
-    @Override
-    public String toString() {
-        return "Game{" +
-            "board=\n" + board +
-            ", whitePlayer=" + whitePlayer +
-            ", blackPlayer=" + blackPlayer +
-            '}';
     }
 }

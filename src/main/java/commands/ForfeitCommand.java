@@ -10,7 +10,7 @@ import othello.BoardRenderer;
 import services.game.IGameService;
 import services.stats.IStatsService;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 public class ForfeitCommand extends Command {
 
@@ -41,6 +41,6 @@ public class ForfeitCommand extends Command {
         var view = GameResultView.createForfeitView(result, statsResult, image);
         ctx.replyView(view);
 
-        LOGGER.info(player + " has forfeited");
+        LOGGER.info("Player: " + player + " has forfeited");
     }
 }

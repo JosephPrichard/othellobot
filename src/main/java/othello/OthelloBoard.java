@@ -34,7 +34,7 @@ public class OthelloBoard {
     }
 
     public static OthelloBoard from(OthelloBoard board) {
-       return new OthelloBoard(board.boardA, board.boardB, board.blackMove);
+        return new OthelloBoard(board.boardA, board.boardB, board.blackMove);
     }
 
     public static OthelloBoard initial() {

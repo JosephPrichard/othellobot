@@ -23,11 +23,11 @@ public class StatsDao implements IStatsDao {
         var transaction = session.beginTransaction();
 
         var stats = new StatsEntity();
-        stats.setPlayerId(playerId);
-        stats.setElo(1000f);
-        stats.setWon(0);
-        stats.setLost(0);
-        stats.setDrawn(0);
+        stats.playerId = playerId;
+        stats.elo = 1000f;
+        stats.won = 0;
+        stats.lost = 0;
+        stats.drawn = 0;
 
         session.save(stats);
         transaction.commit();
@@ -96,9 +96,9 @@ public class StatsDao implements IStatsDao {
         System.out.println(statsDao.getTopStats(10));
 
         var stats = new StatsEntity();
-        stats.setPlayerId(0L);
-        stats.setElo(1015f);
-        stats.setWon(1);
+        stats.playerId = 0L;
+        stats.elo = 1015f;
+        stats.won = 1;
         statsDao.updateStats(stats);
         System.out.println(statsDao.getStats(0L));
 

@@ -7,7 +7,7 @@ package services.challenge;
 import java.util.Map;
 import java.util.concurrent.*;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 // implementation that manages challenges by scheduling them using a scheduled executor service
 public class ChallengeScheduler implements IChallengeScheduler {

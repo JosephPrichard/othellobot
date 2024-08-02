@@ -19,7 +19,7 @@ import java.util.List;
 
 import static commands.string.StringFormat.rightPad;
 import static services.player.Player.Bot.MAX_BOT_LEVEL;
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 public class AnalyzeCommand extends Command {
 
@@ -61,7 +61,7 @@ public class AnalyzeCommand extends Command {
         }
 
         // check if level is within range
-        if (!Player.Bot.isValidLevel(level)) {
+        if (Player.Bot.isInvalidLevel(level)) {
             ctx.reply("Invalid level, should be between 1 and " + MAX_BOT_LEVEL);
             return;
         }

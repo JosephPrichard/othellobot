@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.User;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 // functional interface that fetches user data from an external service
 public interface UserFetcher {

@@ -72,7 +72,7 @@ public class TestMoveCommand {
         when(mock_cmdCtx.getPlayer()).thenReturn(callingPlayer);
 
         var spy_game = spy(Game.start(botPlayer, callingPlayer));
-        when(spy_game.getCurrentPlayer()).thenReturn(botPlayer);
+        when(spy_game.currentPlayer()).thenReturn(botPlayer);
 
         Answer<Void> stubbedFindMove = invocation -> {
             Consumer<Move> argument = invocation.getArgument(2);
@@ -104,8 +104,8 @@ public class TestMoveCommand {
 
         var spy_game = spy(Game.start(blackPlayer, whitePlayer));
         when(spy_game.isOver()).thenReturn(true);
-        when(spy_game.getWhiteScore()).thenReturn(19);
-        when(spy_game.getBlackScore()).thenReturn(21);
+        when(spy_game.whiteScore()).thenReturn(19);
+        when(spy_game.blackScore()).thenReturn(21);
 
         when(mock_statsService.writeStats(any())).thenReturn(new StatsResult());
         when(mock_gameService.makeMove(any(), any())).thenReturn(spy_game);

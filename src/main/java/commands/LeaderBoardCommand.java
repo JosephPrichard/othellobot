@@ -15,7 +15,7 @@ import java.util.List;
 
 import static commands.string.StringFormat.leftPad;
 import static commands.string.StringFormat.rightPad;
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 public class LeaderBoardCommand extends Command {
 
@@ -33,8 +33,8 @@ public class LeaderBoardCommand extends Command {
         var count = 1;
         for (var stats : statsList) {
             desc.append(rightPad(count + ")", 4))
-                .append(leftPad(stats.getPlayer().name(), 32))
-                .append(leftPad(String.format("%.2f", stats.getElo()), 12))
+                .append(leftPad(stats.player().name(), 32))
+                .append(leftPad(String.format("%.2f", stats.elo()), 12))
                 .append("\n");
             count++;
         }

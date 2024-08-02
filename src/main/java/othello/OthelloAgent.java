@@ -6,7 +6,7 @@ package othello;
 
 import java.util.*;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 public final class OthelloAgent {
 
@@ -144,19 +144,53 @@ public final class OthelloAgent {
         return heuristic;
     }
 
+    static class StackFrame {
+
+        OthelloBoard board;
+        int depth;
+        float alpha;
+        float beta;
+        long hashKey;
+        List<OthelloBoard> children = null;
+        int index = 0;
+
+        public StackFrame(OthelloBoard board, int depth, float alpha, float beta) {
+            this.board = board;
+            this.depth = depth;
+            this.alpha = alpha;
+            this.beta = beta;
+        }
+
+        public OthelloBoard nextBoard() {
+            var board = children.get(index);
+            children.set(index, null);
+            index++;
+            return board;
+        }
+
+        public boolean hasNext() {
+            return index < children.size();
+        }
+
+        public boolean hasChildren() {
+            return children != null;
+        }
+    }
+
+
     /**
      * Searches othello game tree using an iterative variant of minimax with alpha beta pruning to evaluate how good a board is
      */
-    public float evaluateLoop(Deque<StackFrame> stack, OthelloBoard initialBoard, int startDepth) {
+    private float evaluateLoop(Deque<StackFrame> stack, OthelloBoard initialBoard, int startDepth) {
         stack.push(new StackFrame(initialBoard, startDepth, -INF, INF));
 
         var heuristic = 0.0f;
         while (!stack.isEmpty()) {
             var frame = stack.peek();
-            var currBoard = frame.board();
+            var currBoard = frame.board;
 
             if (!frame.hasChildren()) {
-                if (frame.depth() == 0 || (frame.depth() >= MIN_DEPTH && System.currentTimeMillis() > stopTime)) {
+                if (frame.depth == 0 || (frame.depth >= MIN_DEPTH && System.currentTimeMillis() > stopTime)) {
                     heuristic = findHeuristic(currBoard);
                     stack.pop();
                     continue;
@@ -179,7 +213,7 @@ public final class OthelloAgent {
 
                 // check tt table to see if we have a cache hit
                 var node = table.get(hashKey);
-                if (node != null && node.depth() >= frame.depth()) {
+                if (node != null && node.depth() >= frame.depth) {
                     heuristic = node.heuristic();
                     stack.pop();
                     continue;
@@ -193,18 +227,18 @@ public final class OthelloAgent {
                 }
 
                 if (!children.isEmpty()) {
-                    frame.setChildren(children);
-                    frame.setHashKey(hashKey);
+                    frame.children = children;
+                    frame.hashKey = hashKey;
 
-                    stack.push(new StackFrame(frame.nextBoard(), frame.depth() - 1, frame.alpha(), frame.beta()));
+                    stack.push(new StackFrame(frame.nextBoard(), frame.depth - 1, frame.alpha, frame.beta));
                 } else {
                     if (currBoard.isBlackMove()) {
-                        table.put(new TTNode(frame.hashKey(), frame.alpha(), frame.depth()));
-                        heuristic = frame.alpha();
+                        table.put(new TTable.Node(frame.hashKey, frame.alpha, frame.depth));
+                        heuristic = frame.alpha;
                         stack.pop();
                     } else {
-                        table.put(new TTNode(frame.hashKey(), frame.beta(), frame.depth()));
-                        heuristic = frame.beta();
+                        table.put(new TTable.Node(frame.hashKey, frame.beta, frame.depth));
+                        heuristic = frame.beta;
                         stack.pop();
                     }
                 }
@@ -212,29 +246,29 @@ public final class OthelloAgent {
                 var doPrune = false;
 
                 if (currBoard.isBlackMove()) {
-                    frame.setAlpha(Math.max(frame.alpha(), heuristic));
-                    if (frame.alpha() >= frame.beta()) {
+                    frame.alpha = Math.max(frame.alpha, heuristic);
+                    if (frame.alpha >= frame.beta) {
                         doPrune = true;
                     }
 
                     if (frame.hasNext() && !doPrune) {
-                        stack.push(new StackFrame(frame.nextBoard(), frame.depth() - 1, frame.alpha(), frame.beta()));
+                        stack.push(new StackFrame(frame.nextBoard(), frame.depth - 1, frame.alpha, frame.beta));
                     } else {
-                        table.put(new TTNode(frame.hashKey(), frame.alpha(), frame.depth()));
-                        heuristic = frame.alpha();
+                        table.put(new TTable.Node(frame.hashKey, frame.alpha, frame.depth));
+                        heuristic = frame.alpha;
                         stack.pop();
                     }
                 } else {
-                    frame.setBeta(Math.min(frame.beta(), heuristic));
-                    if (frame.beta() <= frame.alpha()) {
+                    frame.beta = Math.min(frame.beta, heuristic);
+                    if (frame.beta <= frame.alpha) {
                         doPrune = true;
                     }
 
                     if (frame.hasNext() && !doPrune) {
-                        stack.push(new StackFrame(frame.nextBoard(), frame.depth() - 1, frame.alpha(), frame.beta()));
+                        stack.push(new StackFrame(frame.nextBoard(), frame.depth - 1, frame.alpha, frame.beta));
                     } else {
-                        table.put(new TTNode(frame.hashKey(), frame.beta(), frame.depth()));
-                        heuristic = frame.beta();
+                        table.put(new TTable.Node(frame.hashKey, frame.beta, frame.depth));
+                        heuristic = frame.beta;
                         stack.pop();
                     }
                 }
@@ -287,7 +321,7 @@ public final class OthelloAgent {
                     break;
                 }
             }
-            table.put(new TTNode(hashKey, alpha, depth));
+            table.put(new TTable.Node(hashKey, alpha, depth));
             return alpha;
         } else {
             for (var child : children) {
@@ -296,7 +330,7 @@ public final class OthelloAgent {
                     break;
                 }
             }
-            table.put(new TTNode(hashKey, beta, depth));
+            table.put(new TTable.Node(hashKey, beta, depth));
             return beta;
         }
     }
@@ -306,11 +340,12 @@ public final class OthelloAgent {
     }
 
     public float findHeuristic(OthelloBoard board) {
-        return 50f * findParityHeuristic(board)
-            + 100f * findCornerHeuristic(board)
-            + 100f * findMobilityHeuristic(board)
-            + 50f * findXcHeuristic(board)
-            + 100f * findStabilityHeuristic(board);
+        return
+            50f * findParityHeuristic(board)
+                + 100f * findCornerHeuristic(board)
+                + 100f * findMobilityHeuristic(board)
+                + 50f * findXcHeuristic(board)
+                + 100f * findStabilityHeuristic(board);
     }
 
     private float findParityHeuristic(OthelloBoard board) {

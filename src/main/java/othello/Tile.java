@@ -25,6 +25,7 @@ public record Tile(int row, int col) {
         return col;
     }
 
+    @Override
     public String toString() {
         var c = (char) (col + 'a');
         var r = Integer.toString(row + 1);

@@ -15,7 +15,7 @@ import services.player.Player;
 
 import java.util.Objects;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 public class ChallengeCommand extends Command {
 
@@ -55,7 +55,7 @@ public class ChallengeCommand extends Command {
             level = 3L;
         }
 
-        if (!Player.Bot.isValidLevel(level)) {
+        if (Player.Bot.isInvalidLevel(level)) {
             ctx.reply("Invalid level. Type !help analyze for valid levels.");
             return;
         }

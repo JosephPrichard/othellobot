@@ -14,7 +14,7 @@ import services.stats.Stats;
 
 import java.awt.*;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 public class StatsCommand extends Command {
 
@@ -27,12 +27,12 @@ public class StatsCommand extends Command {
     public MessageEmbed buildStatsEmbed(Stats stats, User author) {
         var embed = new EmbedBuilder();
         embed.setColor(Color.GREEN)
-            .setTitle(stats.getPlayer().name() + "'s stats")
-            .addField("Rating", Float.toString(stats.getElo()), false)
-            .addField("Win Rate", stats.getWinRate() + "%", false)
-            .addField("Won", Integer.toString(stats.getWon()), true)
-            .addField("Lost", Integer.toString(stats.getLost()), true)
-            .addField("Drawn", Integer.toString(stats.getDrawn()), true)
+            .setTitle(stats.player().name() + "'s stats")
+            .addField("Rating", Float.toString(stats.elo()), false)
+            .addField("Win Rate", stats.winRate() + "%", false)
+            .addField("Won", Integer.toString(stats.won()), true)
+            .addField("Lost", Integer.toString(stats.lost()), true)
+            .addField("Drawn", Integer.toString(stats.drawn()), true)
             .setThumbnail(author.getAvatarUrl());
         return embed.build();
     }
@@ -49,6 +49,6 @@ public class StatsCommand extends Command {
         var embed = buildStatsEmbed(stats, user);
         ctx.replyEmbeds(embed);
 
-        LOGGER.info("Retrieved stats for " + stats.getPlayer());
+        LOGGER.info("Retrieved stats for " + stats.player());
     }
 }

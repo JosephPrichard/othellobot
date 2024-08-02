@@ -7,13 +7,12 @@ package services.stats;
 import services.game.GameResult;
 import services.player.Player;
 import services.player.UserFetcher;
+import static utils.LogUtils.LOGGER;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-// implementation that delegates persistence to a data access object and performs calculations, mapping, and flow control
-// depends on blocking io dao class and therefore also uses blocking io
 public class StatsService implements IStatsService {
 
     public static final int ELO_K = 30;
@@ -28,7 +27,7 @@ public class StatsService implements IStatsService {
     public Stats readStats(Player player) {
         var statsEntity = statsDao.getOrSaveStats(player.id());
         // we assume the tag can be loaded, so we throw an exception if it cannot be read
-        var tag = userFetcher.fetchUsername(statsEntity.getPlayerId()).join();
+        var tag = userFetcher.fetchUsername(statsEntity.playerId).join();
         return new Stats(statsEntity, tag);
     }
 
@@ -39,9 +38,9 @@ public class StatsService implements IStatsService {
         var futures = statsEntityList
             .stream()
             .map((entity) ->
-                Player.Bot.isBotId(entity.getPlayerId())
+                Player.Bot.isBotId(entity.playerId)
                     ? CompletableFuture.<String>completedFuture(null)
-                    : userFetcher.fetchUsername(entity.getPlayerId())
+                    : userFetcher.fetchUsername(entity.playerId)
             )
             .toList();
 
@@ -52,7 +51,7 @@ public class StatsService implements IStatsService {
 
             var tag = future.join();
             if (tag == null) {
-                tag = Player.Bot.name(statsEntity.getPlayerId());
+                tag = Player.Bot.name(statsEntity.playerId);
             }
 
             statsList.add(new Stats(statsEntity, tag));
@@ -61,43 +60,43 @@ public class StatsService implements IStatsService {
         return statsList;
     }
 
-    public static float calcProbability(float rating1, float rating2) {
+    public static float probability(float rating1, float rating2) {
         return 1.0f / (1.0f + ((float) Math.pow(10, (rating1 - rating2) / 400f)));
     }
 
-    public static float calcEloWon(float rating, float probability) {
+    public static float eloWon(float rating, float probability) {
         return rating + ELO_K * (1f - probability);
     }
 
-    public static float calcEloLost(float rating, float probability) {
+    public static float eloLost(float rating, float probability) {
         return rating - ELO_K * probability;
     }
 
     public StatsResult writeStats(GameResult result) {
-        var winnerStats = statsDao.getOrSaveStats(result.winner().id());
-        var loserStats = statsDao.getOrSaveStats(result.loser().id());
+        var win = statsDao.getOrSaveStats(result.winner().id());
+        var loss = statsDao.getOrSaveStats(result.loser().id());
 
         if (result.isDraw() || result.winner().equals(result.loser())) {
             // draw games don't need to update the elo, nor do games against self
-            return new StatsResult(winnerStats.getElo(), loserStats.getElo(), 0, 0);
+            var stats = new StatsResult(win.elo, loss.elo, 0, 0);
+            LOGGER.info("Wrote stats with result: " + stats);
+            return stats;
         }
 
-        var winnerEloBefore = winnerStats.getElo();
-        var loserEloBefore = loserStats.getElo();
-        var probWin = calcProbability(loserStats.getElo(), winnerStats.getElo());
-        var probLost = calcProbability(winnerStats.getElo(), loserStats.getElo());
-        var winnerEloAfter = calcEloWon(winnerStats.getElo(), probWin);
-        var loserEloAfter = calcEloLost(loserStats.getElo(), probLost);
-        var winnerEloDiff = winnerEloAfter - winnerEloBefore;
-        var loserEloDiff = loserEloAfter - loserEloBefore;
+        var winEloBefore = win.elo;
+        var lossEloBefore = loss.elo;
+        win.elo = eloWon(win.elo, probability(loss.elo, win.elo));
+        loss.elo = eloLost(loss.elo, probability(win.elo, loss.elo));
+        win.won += 1;
+        loss.lost += 1;
 
-        winnerStats.setElo(winnerEloAfter);
-        loserStats.setElo(loserEloAfter);
-        winnerStats.setWon(winnerStats.getWon() + 1);
-        loserStats.setLost(loserStats.getLost() + 1);
+        statsDao.updateStats(win, loss);
 
-        statsDao.updateStats(winnerStats, loserStats);
+        var winDiff = win.elo - winEloBefore;
+        var lossDiff = loss.elo - lossEloBefore;
 
-        return new StatsResult(winnerStats.getElo(), loserStats.getElo(), winnerEloDiff, loserEloDiff);
+        var stats = new StatsResult(win.elo, loss.elo, winDiff, lossDiff);
+        LOGGER.info("Wrote stats with result: " + stats);
+        return stats;
     }
 }

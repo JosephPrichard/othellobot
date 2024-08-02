@@ -17,10 +17,13 @@ import services.player.Player;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 public class SimulateCommand extends Command {
 
@@ -36,7 +39,7 @@ public class SimulateCommand extends Command {
     }
 
     private void gameLoop(Game game, BlockingQueue<Optional<GameView>> queue, String id) {
-        int depth = Player.Bot.getDepthFromId(game.getCurrentPlayer().id());
+        int depth = Player.Bot.getDepthFromId(game.currentPlayer().id());
 
         final var board = game.board();
         agentDispatcher.findMove(board, depth, (bestMove) -> {

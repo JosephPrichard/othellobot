@@ -31,7 +31,7 @@ import java.util.logging.Level;
 import static commands.SimulateCommand.MAX_DELAY;
 import static commands.SimulateCommand.MIN_DELAY;
 import static services.player.Player.Bot.MAX_BOT_LEVEL;
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 public class OthelloBot extends ListenerAdapter {
 

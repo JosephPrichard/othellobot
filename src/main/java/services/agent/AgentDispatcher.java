@@ -15,7 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
 // implementation of the dispatcher that runs an agent evaluator on a specific thread
 public class AgentDispatcher implements IAgentDispatcher {
@@ -49,7 +49,8 @@ public class AgentDispatcher implements IAgentDispatcher {
                 var moves = agent.findRankedMoves(board, depth);
                 agentsQueue.add(agent);
 
-                LOGGER.info("Finished agent ranked moves calculation of depth " + depth);
+                LOGGER.info("Finished agent ranked moves calculation of depth " + depth + ": "
+                    + moves.stream().map(Move::toString).reduce("", String::concat));
                 onComplete.accept(moves);
             } catch (Exception ex) {
                 LOGGER.warning("Error occurred while processing a find moves event " + ex);
@@ -67,7 +68,7 @@ public class AgentDispatcher implements IAgentDispatcher {
                 var move = agent.findBestMove(board, depth);
                 agentsQueue.add(agent);
 
-                LOGGER.info("Finished agent best move calculation of depth " + depth);
+                LOGGER.info("Finished agent best move calculation of depth " + depth + ": " + move);
                 onComplete.accept(move);
             } catch (Exception ex) {
                 LOGGER.warning("Error occurred while processing a find move event " + ex);

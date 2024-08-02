@@ -22,9 +22,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import static utils.Logger.LOGGER;
+import static utils.LogUtils.LOGGER;
 
-// implementation of an in memory game storage using a loading cache
 public class GameService implements IGameService {
 
     private final LoadingCache<Long, Optional<Game>> games;
@@ -118,7 +117,7 @@ public class GameService implements IGameService {
         }
 
         synchronized (game) {
-            if (!game.getCurrentPlayer().equals(player)) {
+            if (!game.currentPlayer().equals(player)) {
                 throw new TurnException();
             }
 
@@ -145,7 +144,7 @@ public class GameService implements IGameService {
 
     private void onGameExpiry(Game game) {
         // call the stats service to update the stats where the current player loses
-        var forfeitResult = GameResult.WinLoss(game.getOtherPlayer(), game.getCurrentPlayer());
+        var forfeitResult = GameResult.WinLoss(game.otherPlayer(), game.currentPlayer());
         statsService.writeStats(forfeitResult);
     }
 }
